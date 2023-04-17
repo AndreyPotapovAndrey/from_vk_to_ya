@@ -30,7 +30,7 @@ class YaUploader:
         head = self.get_headers()
         params = {'path': f'disk:/{folder_name}'}
 
-        response = requests.put(url, params=params, headers=head)
+        requests.put(url, params=params, headers=head)
         print('Новая папка создана')
 
         return folder_name
@@ -50,7 +50,6 @@ class YaUploader:
             print('Файл успешно сохранён на Я-диск')
 
     def upload_photo(self, photos, folder_name):
-        upload_url = "https://cloud-api.yandex.net/v1/disk/resources/upload"
         folder = self.new_folder(folder_name=folder_name)
         like_list = []
         log_dict = []
@@ -76,7 +75,7 @@ class YaUploader:
             resp = requests.put(href, data=data)
             if resp.status_code == 201:
                 with alive_bar(len(photos)) as bar:
-                    for i in photos:
+                    for _ in photos:
                         bar()
                         time.sleep(1)
-        # return log_dict
+        return log_dict
