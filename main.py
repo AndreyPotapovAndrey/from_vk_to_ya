@@ -16,9 +16,9 @@ if __name__ == '__main__':
     count = input('Сколько фото вы хотите загрузить?')
     folder = input('Введите название папки, в которую хотите сохранить фото:')
     photo_dict = vk.get_photos(name, count)
-    log_dict = ya.upload_photo(photo_dict, folder)
-    print(f'Фото из аккаунта {name} успешно скопированы на Яндекс-диск')
-
+    if photo_dict != "error":
+        log_dict = ya.upload_photo(photo_dict, folder)
+        print(f'Фото из аккаунта {name} успешно скопированы на Яндекс-диск')
 
 
 
