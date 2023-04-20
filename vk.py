@@ -1,4 +1,8 @@
 import requests
+import os
+from os.path import join, dirname
+from dotenv import load_dotenv
+from pprint import pprint
 
 
 class Vk:
@@ -18,6 +22,7 @@ class Vk:
             'fields': 'is_closed'
         }
         user_data = requests.get(user_url, params={**self.params, **user_params}).json()
+        pprint(user_data)
 
         # check if user exists
         if 'response' in user_data:
@@ -27,7 +32,7 @@ class Vk:
 
         # check if user is closed
         if user_data['response'][0].get('is_closed'):
-            return "User is closed"
+            print("User is closed")
 
         # get album photos
         photos_url = self.url + 'photos.get'
@@ -37,16 +42,25 @@ class Vk:
             'rev': 1,
             'extended': 1,
             'photo_sizes': 1,
-            'count': count,
+            # 'count': count
             'access_key': 0
         }
         response = requests.get(photos_url, params={**self.params, **photos_params}).json()
 
+        if response.get('error'):
+            print('ERROR', response['error']['error_msg'])
+            return 'error'
+        elif response['response']['count'] == 0:
+            print('There are no photos from clients profile')
+            return 'no photos'
+
+
+
         # process each photo and collect data with the best quality photo
         photos = []
-        photo_found = False
         for photo in response.get('response', {}).get('items', []):
-            sizes = sorted(photo.get('sizes', []), key=lambda x: x.get('type', 'a'))
+            sizes = sorted(photo.get('sizes', []), key=lambda x: x.get('type', 'x'))
+
 
             # get image url with the highest resolution
             max_size = max(sizes, key=lambda x: x.get('height') * x.get('width'))
@@ -59,10 +73,7 @@ class Vk:
             letter = max_size.get('type', '').upper()[0]
 
             photos.append({'date': date, 'likes': likes, 'type': letter, 'url': url})
-            photo_found = True
+        sorted_photos = sorted(photos, key=lambda x: (x['type'], x['likes']), reverse=True)
 
-        if not photo_found:
-            return "No photos found in the 'profile' album with specified size."
-
-        return photos
+        return sorted_photos[:int(count)]
 
