@@ -52,7 +52,7 @@ class Vk:
             return 'error'
         elif response['response']['count'] == 0:
             print('There are no photos from clients profile')
-            return 'no photos'
+            return 'error'
 
 
 
