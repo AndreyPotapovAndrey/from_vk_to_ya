@@ -1,10 +1,8 @@
 import requests
 from collections import Counter
 from pprint import pprint
-from alive_progress import alive_bar
+from tqdm import tqdm
 import time
-
-
 
 class YaUploader:
     def __init__(self, token):
@@ -37,26 +35,11 @@ class YaUploader:
             return folder_name
         print('Folder_error', response.json()['error']['error_msg'])
 
-
-    # def create_folder(path):
-    #     """Создание папки. \n path: Путь к создаваемой папке."""
-    #     requests.put(f'{URL}?path={path}', headers=head)
-
-    def upload_to_disk(self, file, text, folder_name):
-        folder = self.new_folder(folder_name=folder_name)
-        path = f'{folder}/{file}'
-
-        href = self._get_upload_link(path)
-        response = requests.put(href, data=open(text, 'rb'))
-        pprint(response)
-        if response.status_code == 201:
-            print('Файл успешно сохранён на Я-диск')
-
     def upload_photo(self, photos, folder_name):
         folder = self.new_folder(folder_name=folder_name)
         like_list = []
         log_dict = []
-        for photo in photos:
+        for photo in tqdm(photos, sesc='Processing photos', unit='photo'):
             url = photo['url']
             date = photo['date']
             likes = photo['likes']
@@ -71,10 +54,5 @@ class YaUploader:
             response = requests.get(url)
             data = response.content
             resp = requests.put(href, data=data)
-            if resp.status_code == 201:
-                    with alive_bar(len(photos)) as bar:
-                        for _ in photos:
-                            bar()
-                            time.sleep(1)
 
         return log_dict
