@@ -3,7 +3,7 @@ from vk import Vk
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
-
+from pprint import pprint
 
 if __name__ == '__main__':
     dotenv_path = join(dirname(__file__), '.env')
@@ -19,6 +19,8 @@ if __name__ == '__main__':
     if photo_dict != "error":
         log_dict = ya.upload_photo(photo_dict, folder)
         print(f'Фото из аккаунта {name} успешно скопированы на Яндекс-диск')
+        print(f'Информация о сохранённых на Я-диск фото:')
+        pprint(log_dict)
 
 
 
