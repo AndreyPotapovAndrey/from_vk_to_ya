@@ -54,13 +54,10 @@ class Vk:
             print('There are no photos from clients profile')
             return 'error'
 
-
-
         # process each photo and collect data with the best quality photo
         photos = []
         for photo in response.get('response', {}).get('items', []):
             sizes = sorted(photo.get('sizes', []), key=lambda x: x.get('type', 'x'))
-
 
             # get image url with the highest resolution
             max_size = max(sizes, key=lambda x: x.get('height') * x.get('width'))
@@ -71,8 +68,8 @@ class Vk:
 
             # create a letter to denote the size of the largest photo
             letter = max_size.get('type', '').upper()[0]
-
-            photos.append({'date': date, 'likes': likes, 'type': letter, 'url': url})
+            if url != " ":
+                photos.append({'date': date, 'likes': likes, 'type': letter, 'url': url})
         sorted_photos = sorted(photos, key=lambda x: (x['type'], x['likes']), reverse=True)
 
         return sorted_photos[:int(count)]
