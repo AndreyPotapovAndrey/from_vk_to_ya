@@ -1,8 +1,9 @@
 import requests
 from collections import Counter
 from pprint import pprint
-from tqdm import tqdm
 import time
+from tqdm import tqdm
+
 
 class YaUploader:
     def __init__(self, token):
@@ -35,11 +36,21 @@ class YaUploader:
             return folder_name
         print('Folder_error', response.json()['error']['error_msg'])
 
+    def upload_to_disk(self, file, text, folder_name):
+        folder = self.new_folder(folder_name=folder_name)
+        path = f'{folder}/{file}'
+
+        href = self._get_upload_link(path)
+        response = requests.put(href, data=open(text, 'rb'))
+        pprint(response)
+        if response.status_code == 201:
+            print('Файл успешно сохранён на Я-диск')
+
     def upload_photo(self, photos, folder_name):
         folder = self.new_folder(folder_name=folder_name)
         like_list = []
         log_dict = []
-        for photo in tqdm(photos, sesc='Processing photos', unit='photo'):
+        for photo in tqdm(photos, desc='Processing photos', unit='photo'):
             url = photo['url']
             date = photo['date']
             likes = photo['likes']
@@ -49,6 +60,7 @@ class YaUploader:
             for v in counter.values():
                 if v > 1:
                     name = f'{likes}likes{date}.jpg'
+            log_dict.append(({'file_name': name, 'size': photo['type']}))
             path = f'{folder}/{name}'
             href = self._get_upload_link(path)
             response = requests.get(url)
